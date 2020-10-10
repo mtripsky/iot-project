@@ -1,0 +1,11 @@
+{
+  "name": "iot-sensors-raspberry",
+  "version": "1.0.0",
+  "description": "Measurements from all sensors directly connected to raspberry pi.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matej Tripsky",
+  "license": "ISC"
+}
