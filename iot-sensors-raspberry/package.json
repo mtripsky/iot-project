@@ -7,5 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matej Tripsky",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.29.1",
+    "mqtt": "^4.2.1",
+    "node-dht-sensor": "^0.4.3",
+    "pino": "^6.7.0",
+    "pino-pretty": "^4.3.0"
+  }
 }
