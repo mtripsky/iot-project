@@ -2,6 +2,7 @@ FROM arm32v7/node:12-alpine
 
 EXPOSE 8181
 
+
 # Create the work dir and set permissions as WORKDIR set the permissions as root
 RUN mkdir /home/node/app/ && chown -R node:node /home/node/app
 
@@ -9,10 +10,21 @@ WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
 
-# set the context from now on to use the node user, which is created in the base image
-USER node
+# set the context from now on to use the root user for installing dependencies
+USER root
 
-RUN npm install --only=prod && npm cache clean --force --loglevel=error
+# When using alpine, you need to install build dependencies for some node module to be able to be built natively
+RUN apk --no-cache --virtual build-dependencies add \
+    python \
+    make \
+    g++ \
+    && npm install \
+    && apk del build-dependencies
+
+# set the context from now on to use the node user, which is created in the base image
+USER node 
+
+RUN npm cache clean --force --loglevel=error
 
 # Copy app source
 COPY --chown=node:node index.js .

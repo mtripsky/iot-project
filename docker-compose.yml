@@ -5,7 +5,7 @@ services:
     volumes:
       - './mosquitto:/mosquitto'
     networks:
-      - localnet
+      - iot-network
     ports:
       - '1883:1883'
   iot-sensors-raspberry:
@@ -16,6 +16,6 @@ services:
       - MQTT_BROKER_PORT=1883
       - NODE_ENV=production
     networks:
-      - clim-network
+      - iot-network
 networks:
-  clim-network:
+  iot-network:
