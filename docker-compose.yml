@@ -1,0 +1,21 @@
+version: '3'
+services:
+  iot-broker:
+    image: eclipse-mosquitto
+    volumes:
+      - './mosquitto:/mosquitto'
+    networks:
+      - localnet
+    ports:
+      - '1883:1883'
+  iot-sensors-raspberry:
+    image: 'mtripsky/iot-sensors-raspberry:0.1.0'
+    container_name: 'iot-sensors-raspberry'
+    environment:
+      - MQTT_BROKER_HOST=localhost
+      - MQTT_BROKER_PORT=1883
+      - NODE_ENV=production
+    networks:
+      - clim-network
+networks:
+  clim-network:
