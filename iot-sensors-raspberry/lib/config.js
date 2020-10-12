@@ -58,8 +58,8 @@ environments.production = {
     port: process.env.MQTT_BROKER_PORT,
   },
   transmitterTopics: {
-    dhtTemperature: '/home/living-room/dht22/temperature"',
-    dhtHumidity: '/home/living-room/dht22/humidity"',
+    dhtTemperature: '/home/living-room/dht22/temperature',
+    dhtHumidity: '/home/living-room/dht22/humidity',
   },
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {

@@ -5,22 +5,18 @@ services:
     restart: always
     container_name: iot-broker
     volumes:
-      - ./iot-broker/config:/mosquitto/config
+      - ./iot-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./iot-broker/data:/mosquitto/data
       - ./iot-broker/log:/mosquitto/log
-    networks:
-      - iot-network
+    network_mode: 'host'
     ports:
-      - 8883:8883
+      - 1883:1883
       - 9001:9001
   iot-sensors-raspberry:
-    image: 'mtripsky/iot-sensors-raspberry:0.1.0'
+    image: 'mtripsky/iot-sensors-raspberry:latest'
     container_name: 'iot-sensors-raspberry'
     environment:
-      - MQTT_BROKER_HOST=iot-broker
-      - MQTT_BROKER_PORT=8883
+      - MQTT_BROKER_HOST=localhost
+      - MQTT_BROKER_PORT=1883
       - NODE_ENV=production
-    networks:
-      - iot-network
-networks:
-  iot-network:
+    network_mode: 'host'
