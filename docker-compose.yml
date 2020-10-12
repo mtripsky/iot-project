@@ -2,17 +2,22 @@ version: '3'
 services:
   iot-broker:
     image: eclipse-mosquitto
+    restart: always
+    container_name: iot-broker
     volumes:
-      - './mosquitto:/mosquitto'
+      - ./iot-broker/config:/mosquitto/config
+      - ./iot-broker/data:/mosquitto/data
+      - ./iot-broker/log:/mosquitto/log
     networks:
       - iot-network
     ports:
-      - '1883:1883'
+      - 1883:1883
+      - 9001:9001
   iot-sensors-raspberry:
     image: 'mtripsky/iot-sensors-raspberry:0.1.0'
     container_name: 'iot-sensors-raspberry'
     environment:
-      - MQTT_BROKER_HOST=localhost
+      - MQTT_BROKER_HOST=iot-broker
       - MQTT_BROKER_PORT=1883
       - NODE_ENV=production
     networks:

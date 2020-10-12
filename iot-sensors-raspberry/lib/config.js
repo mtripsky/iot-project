@@ -54,8 +54,8 @@ const environments = {};
 // };
 environments.production = {
   mqtt: {
-    broker: 'localhost',
-    port: 1883,
+    broker: process.env.MQTT_BROKER_HOST,
+    port: process.env.MQTT_BROKER_PORT,
   },
   transmitterTopics: {
     dhtTemperature: '/home/living-room/dht22/temperature"',
