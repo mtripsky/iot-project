@@ -13,7 +13,7 @@ services:
       - 1883:1883
       - 9001:9001
   iot-sensors-raspberry:
-    image: 'mtripsky/iot-sensors-raspberry:latest'
+    image: 'mtripsky/iot-sensors-raspberry:0.1.1'
     container_name: 'iot-sensors-raspberry'
     environment:
       - MQTT_BROKER_HOST=localhost

@@ -9,7 +9,7 @@ const dhtSensor = {};
 dhtSensor.read = function read(callback) {
   logger.info(`envName: ${config.envName}`);
   if (config.envName === constants.ENVIRONMENTS.PRODUCTION) {
-    dht.read(22, constants.GPIO_PINS.DHT22, (err, temperature, humidity) => {
+    dht.read(22, config.gpioPins.DHT22, (err, temperature, humidity) => {
       if (!err) {
         callback(null, temperature, humidity);
       } else {

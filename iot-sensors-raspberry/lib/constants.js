@@ -8,8 +8,4 @@ module.exports = Object.freeze({
     PRODUCTION: 'production',
     DEVELOPMENT: 'development',
   },
-
-  GPIO_PINS: {
-    DHT22: 16,
-  },
 });

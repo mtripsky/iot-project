@@ -61,6 +61,9 @@ environments.production = {
     dhtTemperature: '/home/living-room/dht22/temperature',
     dhtHumidity: '/home/living-room/dht22/humidity',
   },
+  gpioPins: {
+    DHT22: 16,
+  },
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
     level: process.env.LOG_LEVEL,
