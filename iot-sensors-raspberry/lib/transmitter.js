@@ -12,7 +12,7 @@ const transmitter = {};
 transmitter.connect = function connect(callback) {
   const connectOptions = {
     port: config.mqtt.port,
-    host: config.mqtt.broker,
+    host: config.mqtt.host,
     rejectUnauthorized: false,
   };
 
@@ -34,9 +34,13 @@ transmitter.connect = function connect(callback) {
   });
 };
 
-transmitter.send = function send(data, topic, callback) {
+transmitter.send = function send(sensorMeasurement, topic, callback) {
   const message = {
-    data,
+    device: sensorMeasurement.device,
+    type: sensorMeasurement.type,
+    value: sensorMeasurement.value,
+    unit: sensorMeasurement.unit,
+    location: sensorMeasurement.location,
     timeStamp: moment().unix(),
   };
 

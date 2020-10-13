@@ -4,6 +4,22 @@ const logger = require('./logger');
 const config = require('./config');
 const constants = require('./constants');
 
+const dhtSensorName = 'DHT22';
+let temperatureMeasurement = {
+  device: dhtSensorName,
+  type: 'Temperature',
+  value: NaN,
+  unit: '°C',
+  location: 'HOME-LR',
+};
+let humidityMeasurement = {
+  device: dhtSensorName,
+  type: 'Humidity',
+  value: NaN,
+  unit: '%',
+  location: 'HOME-LR',
+};
+
 const dhtSensor = {};
 
 dhtSensor.read = function read(callback) {
@@ -11,7 +27,10 @@ dhtSensor.read = function read(callback) {
   if (config.envName === constants.ENVIRONMENTS.PRODUCTION) {
     dht.read(22, config.gpioPins.DHT22, (err, temperature, humidity) => {
       if (!err) {
-        callback(null, temperature, humidity);
+        temperatureMeasurement.value = temperature;
+        humidityMeasurement.value = humidity;
+
+        callback(null, temperatureMeasurement, humidityMeasurement);
       } else {
         logger.error(
           `An error occurred while trying to read the temperature and humidity from sensor. ${err}`
