@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="0.1.1"
+VERSION="0.1.2"
 ARCH="arm32v7"
 APP="iot-persistence"
 docker buildx build -f ./Dockerfile-$APP-$ARCH -t $APP:$VERSION . --load
