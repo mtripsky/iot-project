@@ -1,6 +1,7 @@
 const logger = require('./lib/logger');
 
 const receiver = require('./lib/receiver');
+const firebaseClient = require('./lib/firebaseClient');
 
 const app = {};
 
@@ -11,10 +12,11 @@ app.init = function init() {
     () => {
       logger.info('Successfully connected to MQTT broker and subscribed to topics.');
     },
-    (message) => {
+    (topic, message) => {
       logger.info(
         `Received message: device: [${message.device}-${message.location}] ${message.type}=${message.value}${message.unit}`
       );
+      firebaseClient.createEntry(topic, message);
     }
   );
 };

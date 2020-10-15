@@ -59,7 +59,7 @@ environments.production = {
   },
   receiverTopics: {
     homeClima: '/home/living-room/#',
-    weather: '/weather/outside/#',
+    weather: '/weather/#',
   },
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
@@ -71,9 +71,7 @@ environments.production = {
 };
 // Determine which environment was passed as a command-line argument
 const currentEnvironment =
-  typeof process.env.NODE_ENV === 'string'
-    ? process.env.NODE_ENV.toLowerCase()
-    : '';
+  typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : '';
 
 // Check that the current environment is one of the environment defined above,
 // if not default to production
