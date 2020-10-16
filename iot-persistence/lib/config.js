@@ -16,6 +16,10 @@ environments.development = {
   log: {
     level: process.env.LOG_LEVEL,
   },
+  firebaseDB: {
+    serviceAccountKey: process.env.FIREBASE_SERVICE_KEY,
+    url: process.env.FIREBASE_URL,
+  },
 };
 
 environments.production = {
@@ -30,6 +34,10 @@ environments.production = {
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
     level: process.env.LOG_LEVEL,
+  },
+  firebaseDB: {
+    serviceAccountKey: process.env.FIREBASE_SERVICE_KEY,
+    url: process.env.FIREBASE_URL,
   },
 };
 

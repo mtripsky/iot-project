@@ -1,22 +1,23 @@
 const firebase = require('firebase-admin');
 
+const config = require('./config');
 const dbHelper = require('./dbEntry');
 const logger = require('./logger');
 
 const client = {};
 
 client.init = function init() {
-  const serviceAccount = require('../serviceAccountKey.json');
+  const serviceAccount = require(config.firebaseDB.serviceAccountKey);
 
   firebase.initializeApp({
     credential: firebase.credential.cert(serviceAccount),
-    databaseURL: 'https://weather-station-etterbeek.firebaseio.com',
+    databaseURL: config.firebaseDB.url,
   });
 };
 
 client.createEntry = function createEntry(topic, message) {
   logger.debug(`FirebaseClient saves message into db with topic ${topic}.`);
-  admin.database().ref(topic).set(dbHelper.createFirebaseEntry(message));
+  firebase.database().ref(topic).set(dbHelper.createFirebaseEntry(message));
 };
 
 client.init();
