@@ -16,7 +16,7 @@ receiver.connect = function connect(connectCallback, msgCallback) {
   receiver.client = mqtt.connect(mqttConnectionOptions);
   receiver.client.on('connect', () => {
     logger.info(
-      `Connected successfully to the MQTT broker at ${config.mqtt.broker} on port ${config.mqtt.port}`
+      `Connected successfully to the MQTT broker at ${config.mqtt.host} on port ${config.mqtt.port}`
     );
 
     receiver.client.subscribe(config.receiverTopics.homeClima);
@@ -24,8 +24,9 @@ receiver.connect = function connect(connectCallback, msgCallback) {
 
     receiver.client.on('message', (topic, message) => {
       if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
+        logger.info(`Received: ${message.toString()}`);
         const parsedMessage = helper.parseJsonToObject(message.toString());
-        msgCallback(parsedMessage);
+        msgCallback(topic, parsedMessage);
       }
     });
 

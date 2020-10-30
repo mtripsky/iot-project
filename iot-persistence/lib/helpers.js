@@ -10,7 +10,7 @@ lib.parseJsonToObject = function parseJsonToObject(jsonString) {
     }
     return {};
   } catch (err) {
-    logger.debug(
+    logger.error(
       `parseJsonToObject: An error occurred while trying to parse "${jsonString}". ${err}`
     );
     return {};

@@ -5,10 +5,9 @@ const lib = {};
 lib.createFirebaseEntry = function createFirebaseEntry(message) {
   const dbTime = moment();
   return {
-    time: moment(message.timestamp).format(),
     timestamp: message.timestamp,
     dbTime: dbTime.format(),
-    dbTimeStamp: dbTime.unix(),
+    dbTimestamp: dbTime.unix(),
     value: message.value,
     unit: message.unit,
   };

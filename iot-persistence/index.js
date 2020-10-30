@@ -5,20 +5,43 @@ const firebaseClient = require('./lib/firebaseClient');
 
 const app = {};
 
+const moment = require('moment');
+
 app.init = function init() {
   logger.info('Started persistence service to collect data into databases');
 
-  receiver.connect(
-    () => {
-      logger.info('Successfully connected to MQTT broker and subscribed to topics.');
-    },
-    (topic, message) => {
-      logger.info(
-        `Received message: device: [${message.device}-${message.location}] ${message.type}=${message.value}${message.unit}`
-      );
-      firebaseClient.createEntry(topic, message);
-    }
-  );
+  const message = {
+    device: 'DHT22',
+    type: 'Temperature',
+    value: 20,
+    unit: '°C',
+    location: 'Living room',
+    timestamp: moment().unix(),
+  };
+  const topic = '/home/living-room/temperature';
+
+  firebaseClient.createEntry(topic, message);
+  // receiver.connect(
+  //   () => {
+  //     logger.info('Successfully connected to MQTT broker and subscribed to topics.');
+  //   },
+  //   (topic, message) => {
+  //     try {
+  //       logger.info(`Received msg: ${message.device}.`);
+  //       logger.info(
+  //         `Received message: device: [${message.device}-${message.location}] ${message.type}=${message.value}${message.unit}`
+  //       );
+
+  //       firebaseClient.createEntry(topic, message);
+  //       return {};
+  //     } catch (err) {
+  //       logger.error(
+  //         `receiver.connect: An error occurred while trying to parse message "${message}". ${err}`
+  //       );
+  //       return {};
+  //     }
+  //   }
+  // );
 };
 
 app.shutdown = function shutdown() {

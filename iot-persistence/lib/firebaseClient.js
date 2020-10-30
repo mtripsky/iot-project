@@ -1,25 +1,46 @@
-const firebase = require('firebase-admin');
+const admin = require('firebase-admin');
+const moment = require('moment');
 
 const config = require('./config');
 const dbHelper = require('./dbEntry');
 const logger = require('./logger');
+const serviceAccount = require('../db-keys/weather-station-etterbeek-firebase-adminsdk.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://weather-station-etterbeek.firebaseio.com',
+  //databaseURL: config.firebaseDB.url,
+});
 
 const client = {};
+const dbFirebase = admin.database();
 
-client.init = function init() {
-  const serviceAccount = require(config.firebaseDB.serviceAccountKey);
+//const FirebaseRead = require('firebase');
+//const firebaseConfig = require('./firebaseConfig');
 
-  firebase.initializeApp({
-    credential: firebase.credential.cert(serviceAccount),
-    databaseURL: config.firebaseDB.url,
-  });
-};
+//const firebaseDbRead = FirebaseRead.initializeApp(firebaseConfig.firebase);
+
+//const database = firebaseDbRead.database();
 
 client.createEntry = function createEntry(topic, message) {
-  logger.debug(`FirebaseClient saves message into db with topic ${topic}.`);
-  firebase.database().ref(topic).set(dbHelper.createFirebaseEntry(message));
-};
+  logger.info(`FirebaseClient saves message into db with topic: ${topic}`);
 
-client.init();
+  // const ref = database.ref('home/clima/humidity');
+  // ref.once('value', (snapshot) => {
+  //   snapshot.forEach((child) => {
+  //     logger.info(`Humidity=${child.child('value').val()}${child.child('unit').val()}.`);
+  //   });
+  // });
+  const dbTime = moment();
+  dbFirebase
+    .ref('home/living-room/temperature')
+    .set(dbHelper.createFirebaseEntry(message))
+    .then(function () {
+      logger.info('Successfully saved entry into firebase database.');
+    })
+    .catch(function (err) {
+      logger.error(`An error occurred while trying to create firebase entry. Err: ${err}`);
+    });
+};
 
 module.exports = client;

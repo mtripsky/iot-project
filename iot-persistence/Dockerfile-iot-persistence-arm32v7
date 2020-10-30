@@ -29,5 +29,6 @@ RUN npm cache clean --force --loglevel=error
 # Copy app source
 COPY --chown=node:node index.js .
 COPY --chown=node:node lib ./lib/
+COPY --chown=node:node db-keys ./db-keys/
 
 CMD [ "node", "index.js"]
