@@ -1,51 +1,38 @@
 const logger = require('./lib/logger');
+const config = require('./lib/config');
 
 const receiver = require('./lib/receiver');
 const firebaseClient = require('./lib/firebaseClient');
+const postgresClient = require('./lib/postgresClient');
 
 const app = {};
 
-const moment = require('moment');
-
 app.init = function init() {
-  logger.info('Started persistence service to collect data into databases');
+  logger.info(`Starting IoT-persistence service in ${config.envName} mode .......`);
 
-  const message = {
-    device: 'DHT22',
-    type: 'Temperature',
-    value: 20,
-    unit: '°C',
-    location: 'Living room',
-    timestamp: moment().unix(),
-  };
-  const topic = '/home/living-room/temperature';
+  receiver.connect(
+    () => {
+      logger.info('IoT-persistence service was initiated and is listening for messages.');
+    },
+    (topic, message) => {
+      try {
+        firebaseClient.createEntry(topic, message);
+        postgresClient.createEntry(topic, message);
 
-  firebaseClient.createEntry(topic, message);
-  // receiver.connect(
-  //   () => {
-  //     logger.info('Successfully connected to MQTT broker and subscribed to topics.');
-  //   },
-  //   (topic, message) => {
-  //     try {
-  //       logger.info(`Received msg: ${message.device}.`);
-  //       logger.info(
-  //         `Received message: device: [${message.device}-${message.location}] ${message.type}=${message.value}${message.unit}`
-  //       );
-
-  //       firebaseClient.createEntry(topic, message);
-  //       return {};
-  //     } catch (err) {
-  //       logger.error(
-  //         `receiver.connect: An error occurred while trying to parse message "${message}". ${err}`
-  //       );
-  //       return {};
-  //     }
-  //   }
-  // );
+        return {};
+      } catch (err) {
+        logger.error(
+          `Receiver.connect: An error occurred while trying to parse message: "${message.toString()}". ERROR: ${err}`
+        );
+        return {};
+      }
+    }
+  );
 };
 
 app.shutdown = function shutdown() {
   clearInterval(app.intervalTimer);
+  postgresClient.disconnect();
   receiver.disconnect(() => {
     process.exit();
   });

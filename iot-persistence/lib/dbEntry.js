@@ -13,4 +13,16 @@ lib.createFirebaseEntry = function createFirebaseEntry(message) {
   };
 };
 
+lib.createPostgresEntry = function createPostgresEntry(message) {
+  const dbTime = moment();
+  return {
+    time: dbTime.format(),
+    timestamp: dbTime.unix(),
+    value: message.value,
+    unit: message.unit,
+    location: message.location,
+    device: message.device,
+  };
+};
+
 module.exports = lib;

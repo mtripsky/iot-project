@@ -1,7 +1,9 @@
 /*
  * Logging wrapper
  */
-const pinoLogger = require('pino')({ prettyPrint: true });
+const config = require('./config');
+
+const pinoLogger = require('pino')({ prettyPrint: true, level: config.log.level, base: null });
 
 const logger = {};
 

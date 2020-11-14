@@ -3,7 +3,6 @@
  */
 const mqtt = require('mqtt');
 const moment = require('moment');
-
 const logger = require('./logger');
 const config = require('./config');
 
@@ -16,43 +15,34 @@ transmitter.connect = function connect(callback) {
     rejectUnauthorized: false,
   };
 
-  logger.info(
-    `Trying to connect to the MQTT broker at ${config.mqtt.broker} on port ${config.mqtt.port}`
-  );
-
   transmitter.client = mqtt.connect(connectOptions);
 
   transmitter.client.on('connect', () => {
-    logger.info(
-      `Connected successfully to the MQTT broker at ${config.mqtt.broker} on port ${config.mqtt.port}`
-    );
+    logger.info(`Connected successfully to the MQTT broker. HOST: ${config.mqtt.host}, PORT: ${config.mqtt.port}.`);
     callback();
   });
 
   transmitter.client.on('error', (err) => {
-    logger.error(`An error occurred. ${err}`);
+    logger.error(`[Transmitter] An error occurred. ERROR: ${err}`);
   });
 };
 
-transmitter.send = function send(sensorMeasurement, topic, callback) {
+transmitter.send = function send(sensorMeasurement, topic) {
   const message = {
     device: sensorMeasurement.device,
     type: sensorMeasurement.type,
     value: sensorMeasurement.value,
     unit: sensorMeasurement.unit,
     location: sensorMeasurement.location,
-    timeStamp: moment().unix(),
+    timestamp: moment().unix(),
   };
 
   transmitter.client.publish(topic, JSON.stringify(message), (err) => {
     if (err) {
-      logger.error(
-        `An error occurred while trying to publish a message. Err: ${err}`
-      );
+      logger.error(`An error occurred while trying to publish a message. ERROR: ${err}`);
     } else {
-      logger.info('Successfully published message');
+      logger.info(`Successfully published message on topic: ${topic}.`);
     }
-    callback(err);
   });
 };
 

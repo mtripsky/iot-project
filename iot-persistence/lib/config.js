@@ -14,11 +14,17 @@ environments.development = {
   },
   envName: constants.ENVIRONMENTS.DEVELOPMENT,
   log: {
-    level: process.env.LOG_LEVEL,
+    level: 'debug',
   },
   firebaseDB: {
-    serviceAccountKey: process.env.FIREBASE_SERVICE_KEY,
     url: process.env.FIREBASE_URL,
+  },
+  postgresDB: {
+    user: process.env.POSTGRES_USER,
+    database: process.env.POSTGRES_DB,
+    password: process.env.POSTGRES_PASSWORD,
+    port: process.env.POSTGRES_PORT,
+    tableNames: ['temperature', 'humidity', 'light_intensity', 'rain_intensity'],
   },
 };
 
@@ -33,11 +39,17 @@ environments.production = {
   },
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
-    level: process.env.LOG_LEVEL,
+    level: 'info',
   },
   firebaseDB: {
-    serviceAccountKey: process.env.FIREBASE_SERVICE_KEY,
     url: process.env.FIREBASE_URL,
+  },
+  postgresDB: {
+    user: process.env.POSTGRES_USER,
+    database: process.env.POSTGRES_DB,
+    password: process.env.POSTGRES_PASSWORD,
+    port: process.env.POSTGRES_PORT,
+    tableNames: ['temperature', 'humidity', 'light_intensity', 'rain_intensity'],
   },
 };
 

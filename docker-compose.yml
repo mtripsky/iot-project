@@ -7,40 +7,66 @@ services:
     volumes:
       - ./iot-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./iot-broker/data:/mosquitto/data
-      - ./iot-broker/log:/mosquitto/log
     network_mode: 'host'
     ports:
       - 1883:1883
-      - 9001:9001
   iot-sensors-raspberry:
-    image: 'mtripsky/iot-sensors-raspberry:0.1.3'
+    image: 'mtripsky/iot-sensors-raspberry:0.1.6'
     container_name: 'iot-sensors-raspberry'
     environment:
       - MQTT_BROKER_HOST=localhost
       - MQTT_BROKER_PORT=1883
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - SENSORS_READ_INTERVAL=10
     network_mode: 'host'
     privileged: true
     depends_on:
       iot-broker:
+        condition: service_started
+      iot-persistence:
         condition: service_started
     devices:
       - /dev/gpiomem:dev/gpiomem
       - /dev/mem:/dev/mem
   iot-persistence:
-    image: 'mtripsky/iot-persistence:0.1.3'
+    image: 'mtripsky/iot-persistence:0.1.34'
     container_name: 'iot-persistence'
     environment:
       - MQTT_BROKER_HOST=localhost
       - MQTT_BROKER_PORT=1883
-      - NODE_ENV=production
-      - FIREBASE_SERVICE_KEY='./serviceAccountKeyFirebase.json'
-      - FIREBASE_URL='https://weather-station-etterbeek.firebaseio.com'
+      - NODE_ENV=development
+      - FIREBASE_URL=https://weather-station-etterbeek.firebaseio.com
+      - POSTGRES_USER=iot-project
+      - POSTGRES_DB=iot-project
+      - POSTGRES_PASSWORD=iot-project-password
+      - POSTGRES_PORT=5432
     network_mode: 'host'
+    volumes:
+      - ./db-keys/firebase-adminsdk.json:/home/node/app/db-keys/firebase-adminsdk.json
     privileged: true
     depends_on:
       iot-broker:
         condition: service_started
-    devices:
-      - /dev/gpiomem:dev/gpiomem
-      - /dev/mem:/dev/mem
+      iot-db-postgres:
+        condition: service_healthy
+  iot-db-postgres:
+    image: 'arm32v7/postgres'
+    container_name: 'iot-db-postgres'
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=iot-project-password
+      - POSTGRES_USER=iot-project
+      - POSTGRES_DB=iot-project
+    ports:
+      - 5432:5432
+    network_mode: 'bridge'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    privileged: true
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U iot-project']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  db-data:

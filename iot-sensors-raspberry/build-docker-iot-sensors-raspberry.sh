@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="0.1.3"
+VERSION="0.1.6"
 ARCH="arm32v7"
 APP="iot-sensors-raspberry"
 docker buildx build -f ./Dockerfile-$APP-$ARCH -t $APP:$VERSION . --load

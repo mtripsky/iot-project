@@ -16,25 +16,28 @@ receiver.connect = function connect(connectCallback, msgCallback) {
   receiver.client = mqtt.connect(mqttConnectionOptions);
   receiver.client.on('connect', () => {
     logger.info(
-      `Connected successfully to the MQTT broker at ${config.mqtt.host} on port ${config.mqtt.port}`
+      `Connected successfully to the MQTT broker. HOST: ${config.mqtt.host}, PORT: ${config.mqtt.port}.`
     );
 
     receiver.client.subscribe(config.receiverTopics.homeClima);
+    logger.info(`Receiver subscribed to topic: ${config.receiverTopics.homeClima}`);
     receiver.client.subscribe(config.receiverTopics.weather);
+    logger.info(`Receiver subscribed to topic: ${config.receiverTopics.weather}`);
 
     receiver.client.on('message', (topic, message) => {
-      if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
-        logger.info(`Received: ${message.toString()}`);
-        const parsedMessage = helper.parseJsonToObject(message.toString());
-        msgCallback(topic, parsedMessage);
-      }
+      // if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
+      logger.info(`Received message with topic: ${topic}`);
+      const parsedMessage = helper.parseJsonToObject(message.toString());
+
+      msgCallback(topic, parsedMessage);
+      //}
     });
 
     connectCallback();
   });
 
   receiver.client.on('error', (err) => {
-    logger.error(`An error occurred. ${err}.`);
+    logger.error(`Error occurred in Receiver. ERROR: ${err}.`);
   });
 };
 
