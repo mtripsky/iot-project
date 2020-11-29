@@ -7,7 +7,7 @@ services:
     volumes:
       - ./iot-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./iot-broker/data:/mosquitto/data
-    network_mode: 'host'
+    network_mode: 'bridge'
     ports:
       - 1883:1883
   iot-sensors-raspberry:
@@ -17,7 +17,9 @@ services:
       - MQTT_BROKER_HOST=localhost
       - MQTT_BROKER_PORT=1883
       - NODE_ENV=development
-      - SENSORS_READ_INTERVAL=10
+      - SENSORS_READ_INTERVAL=60
+      - SENSOR_BME_CONNECTED=true
+      - SENSOR_DHT_CONNECTED=false
     network_mode: 'host'
     privileged: true
     depends_on:
