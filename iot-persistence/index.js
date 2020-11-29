@@ -22,7 +22,7 @@ app.init = function init() {
         return {};
       } catch (err) {
         logger.error(
-          `Receiver.connect: An error occurred while trying to parse message: "${message.toString()}". ERROR: ${err}`
+          `Receiver.connect: An error occurred while trying to parse message: "${message}". ERROR: ${err}`
         );
         return {};
       }

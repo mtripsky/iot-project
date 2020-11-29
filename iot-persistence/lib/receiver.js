@@ -25,12 +25,18 @@ receiver.connect = function connect(connectCallback, msgCallback) {
     logger.info(`Receiver subscribed to topic: ${config.receiverTopics.weather}`);
 
     receiver.client.on('message', (topic, message) => {
-      // if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
-      logger.info(`Received message with topic: ${topic}`);
-      const parsedMessage = helper.parseJsonToObject(message.toString());
+      if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
+        logger.info(`[1] Received message with topic: ${topic}`);
+        const parsedMessage = helper.parseJsonToObject(message.toString());
 
-      msgCallback(topic, parsedMessage);
-      //}
+        msgCallback(topic, parsedMessage);
+      }
+      if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.weather)) {
+        logger.info(`[2] Received message with topic: ${topic}`);
+        const parsedMessage = helper.parseJsonToObject(message.toString());
+
+        msgCallback(topic, parsedMessage);
+      }
     });
 
     connectCallback();
