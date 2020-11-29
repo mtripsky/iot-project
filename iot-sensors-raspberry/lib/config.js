@@ -9,8 +9,9 @@ environments.development = {
     port: process.env.MQTT_BROKER_PORT,
   },
   transmitterTopics: {
-    dhtTemperature: '/home/living-room/temperature',
-    dhtHumidity: '/home/living-room/humidity',
+    temperatureLR: '/home/living-room/temperature',
+    humidityLR: '/home/living-room/humidity',
+    pressureLR: '/home/living-room/pressure',
   },
   envName: constants.ENVIRONMENTS.DEVELOPMENT,
   log: {
@@ -19,6 +20,8 @@ environments.development = {
   measurement: {
     readInterval: process.env.SENSORS_READ_INTERVAL,
   },
+  bmeSensorConnected: process.env.SENSOR_BME_CONNECTED,
+  dhtSensorConnected: process.env.SENSOR_DHT_CONNECTED,
 };
 
 environments.production = {
@@ -27,8 +30,9 @@ environments.production = {
     port: process.env.MQTT_BROKER_PORT,
   },
   transmitterTopics: {
-    dhtTemperature: '/home/living-room/temperature',
-    dhtHumidity: '/home/living-room/humidity',
+    temperatureLR: '/home/living-room/temperature',
+    humidityLR: '/home/living-room/humidity',
+    pressureLR: '/home/living-room/pressure',
   },
   gpioPins: {
     DHT22: 16,
@@ -40,6 +44,8 @@ environments.production = {
   measurement: {
     readInterval: process.env.SENSORS_READ_INTERVAL,
   },
+  bmeSensorConnected: process.env.SENSOR_BME_CONNECTED,
+  dhtSensorConnected: process.env.SENSOR_DHT_CONNECTED,
 };
 // Determine which environment was passed as a command-line argument
 const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : '';

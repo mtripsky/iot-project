@@ -7,6 +7,7 @@ const process = require('process');
 const config = require('./lib/config');
 const logger = require('./lib/logger');
 const dht = require('./lib/dht22sensor');
+const bme = require('./lib/bmeSensor');
 const transmitter = require('./lib/transmitter');
 
 const app = {};
@@ -22,18 +23,32 @@ app.init = function init() {
 };
 
 app.measureAndSend = function measureAndSend() {
-  dht.read((sensorErr, temperature, humidity) => {
-    if (!sensorErr) {
-      transmitter.send(temperature, config.transmitterTopics.dhtTemperature);
-      transmitter.send(humidity, config.transmitterTopics.dhtHumidity);
-    } else {
-      logger.error(`An error occurred while trying to read the dht sensor. ERROR: ${sensorErr}`);
-    }
+  if (config.dhtSensorConnected) {
+    dht.read((sensorErr, temperature, humidity) => {
+      if (!sensorErr) {
+        transmitter.send(temperature, config.transmitterTopics.temperatureLR);
+        transmitter.send(humidity, config.transmitterTopics.humidityLR);
+      } else {
+        logger.error(`An error occurred while trying to read the dht sensor. ERROR: ${sensorErr}`);
+      }
+    });
+  }
 
-    app.intervalTimer = setTimeout(() => {
-      app.measureAndSend();
-    }, config.measurement.readInterval * 1000);
-  });
+  if (config.bmeSensorConnected) {
+    bme.read((sensorErr, temperature, humidity, pressure) => {
+      if (!sensorErr) {
+        transmitter.send(temperature, config.transmitterTopics.temperatureLR);
+        transmitter.send(humidity, config.transmitterTopics.humidityLR);
+        transmitter.send(pressure, config.transmitterTopics.pressureLR);
+      } else {
+        logger.error(`An error occurred while trying to read the BME sensor. ERROR: ${sensorErr}`);
+      }
+    });
+  }
+
+  app.intervalTimer = setTimeout(() => {
+    app.measureAndSend();
+  }, config.measurement.readInterval * 1000);
 };
 
 app.shutdown = function shutdown() {
