@@ -24,7 +24,7 @@ environments.development = {
     database: process.env.POSTGRES_DB,
     password: process.env.POSTGRES_PASSWORD,
     port: process.env.POSTGRES_PORT,
-    tableNames: ['temperature', 'humidity', 'light_intensity', 'rain_intensity'],
+    tableNames: process.env.TABLE_NAMES.split(','),
   },
 };
 
@@ -49,7 +49,7 @@ environments.production = {
     database: process.env.POSTGRES_DB,
     password: process.env.POSTGRES_PASSWORD,
     port: process.env.POSTGRES_PORT,
-    tableNames: ['temperature', 'humidity', 'light_intensity', 'rain_intensity'],
+    tableNames: process.env.TABLE_NAMES.split(','),
   },
 };
 

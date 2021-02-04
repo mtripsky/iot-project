@@ -1,5 +1,21 @@
 const constants = require('./constants');
 
+stringToBoolean = function (string) {
+  switch (string.toLowerCase().trim()) {
+    case 'true':
+    case 'yes':
+    case '1':
+      return true;
+    case 'false':
+    case 'no':
+    case '0':
+    case null:
+      return false;
+    default:
+      return Boolean(string);
+  }
+};
+
 // Container for all environments
 const environments = {};
 
@@ -20,8 +36,8 @@ environments.development = {
   measurement: {
     readInterval: process.env.SENSORS_READ_INTERVAL,
   },
-  bmeSensorConnected: process.env.SENSOR_BME_CONNECTED,
-  dhtSensorConnected: process.env.SENSOR_DHT_CONNECTED,
+  bmeSensorConnected: stringToBoolean(process.env.SENSOR_BME_CONNECTED),
+  dhtSensorConnected: stringToBoolean(process.env.SENSOR_DHT_CONNECTED),
 };
 
 environments.production = {
@@ -44,8 +60,8 @@ environments.production = {
   measurement: {
     readInterval: process.env.SENSORS_READ_INTERVAL,
   },
-  bmeSensorConnected: process.env.SENSOR_BME_CONNECTED,
-  dhtSensorConnected: process.env.SENSOR_DHT_CONNECTED,
+  bmeSensorConnected: stringToBoolean(process.env.SENSOR_BME_CONNECTED),
+  dhtSensorConnected: stringToBoolean(process.env.SENSOR_DHT_CONNECTED),
 };
 // Determine which environment was passed as a command-line argument
 const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : '';

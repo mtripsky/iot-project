@@ -34,7 +34,7 @@ client.connect = function connect() {
     client.storage
       .query(createTableText)
       .then((res) => {
-        logger.info(
+        logger.debug(
           `[PostgresClient] Table: ${tableName} created. RESULT: ${parseHelper.parseObjectToString(
             res
           )}.`

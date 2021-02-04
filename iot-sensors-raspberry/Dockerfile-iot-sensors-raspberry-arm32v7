@@ -10,16 +10,20 @@ WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
 
+#RUN awk -F':' '{ print $1}' /etc/passwd
+
 # set the context from now on to use the root user for installing dependencies
 USER root
 
+
 # When using alpine, you need to install build dependencies for some node module to be able to be built natively
 RUN apk --no-cache --virtual build-dependencies add \
-    python \
     make \
     g++ \
+    python \
+    && apk add linux-headers \
     && npm install \
-    && apk del build-dependencies
+    && apk del build-dependencies    
 
 # set the context from now on to use the node user, which is created in the base image
 #USER node 

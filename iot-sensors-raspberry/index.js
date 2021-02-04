@@ -14,7 +14,6 @@ const app = {};
 
 app.init = function init() {
   logger.info(`Starting IoT-Sensors-Raspberry service in ${config.envName} mode .......`);
-
   transmitter.connect(() => {
     app.intervalTimer = setTimeout(() => {
       app.measureAndSend();

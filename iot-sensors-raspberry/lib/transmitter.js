@@ -2,7 +2,6 @@
  *
  */
 const mqtt = require('mqtt');
-const moment = require('moment');
 const logger = require('./logger');
 const config = require('./config');
 
@@ -28,16 +27,7 @@ transmitter.connect = function connect(callback) {
 };
 
 transmitter.send = function send(sensorMeasurement, topic) {
-  const message = {
-    device: sensorMeasurement.device,
-    type: sensorMeasurement.type,
-    value: sensorMeasurement.value,
-    unit: sensorMeasurement.unit,
-    location: sensorMeasurement.location,
-    timestamp: moment().unix(),
-  };
-
-  transmitter.client.publish(topic, JSON.stringify(message), (err) => {
+  transmitter.client.publish(topic, JSON.stringify(sensorMeasurement), (err) => {
     if (err) {
       logger.error(`An error occurred while trying to publish a message. ERROR: ${err}`);
     } else {

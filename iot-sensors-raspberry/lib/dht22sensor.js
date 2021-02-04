@@ -3,6 +3,7 @@ const dht = require('node-dht-sensor');
 const logger = require('./logger');
 const config = require('./config');
 const constants = require('./constants');
+const moment = require('moment');
 
 const sensorName = 'DHT22';
 let temperatureMeasurement = {
@@ -11,6 +12,8 @@ let temperatureMeasurement = {
   value: NaN,
   unit: '°C',
   location: 'HOME-LR',
+  time: NaN,
+  timestamp: NaN,
 };
 let humidityMeasurement = {
   device: sensorName,
@@ -18,11 +21,19 @@ let humidityMeasurement = {
   value: NaN,
   unit: '%',
   location: 'HOME-LR',
+  time: NaN,
+  timestamp: NaN,
 };
 
 const dhtSensor = {};
 
 dhtSensor.read = function read(callback) {
+  const time = moment();
+  temperatureMeasurement.time = time;
+  temperatureMeasurement.timestamp = time.unix();
+  humidityMeasurement.time = time;
+  humidityMeasurement.timestamp = time.unix();
+
   if (config.envName === constants.ENVIRONMENTS.PRODUCTION) {
     dht.read(22, config.gpioPins.DHT22, (err, temperature, humidity) => {
       if (!err) {

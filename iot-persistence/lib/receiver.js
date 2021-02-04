@@ -30,12 +30,13 @@ receiver.connect = function connect(connectCallback, msgCallback) {
         const parsedMessage = helper.parseJsonToObject(message.toString());
 
         msgCallback(topic, parsedMessage);
-      }
-      if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.weather)) {
+      } else if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.weather)) {
         logger.info(`[2] Received message with topic: ${topic}`);
         const parsedMessage = helper.parseJsonToObject(message.toString());
 
         msgCallback(topic, parsedMessage);
+      } else {
+        logger.debug(`[3] Received message with topic: ${topic}`);
       }
     });
 

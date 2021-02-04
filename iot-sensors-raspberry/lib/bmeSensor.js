@@ -3,6 +3,7 @@ const BME = require('bme280-sensor');
 const logger = require('./logger');
 const config = require('./config');
 const constants = require('./constants');
+const moment = require('moment');
 
 bmeSensorOptions = {
   i2cBusNo: 1,
@@ -17,6 +18,8 @@ let temperatureMeasurement = {
   value: NaN,
   unit: '°C',
   location: 'HOME-LR',
+  time: NaN,
+  timestamp: NaN,
 };
 let humidityMeasurement = {
   device: sensorName,
@@ -24,6 +27,8 @@ let humidityMeasurement = {
   value: NaN,
   unit: '%',
   location: 'HOME-LR',
+  time: NaN,
+  timestamp: NaN,
 };
 let pressureMeasurement = {
   device: sensorName,
@@ -31,6 +36,8 @@ let pressureMeasurement = {
   value: NaN,
   unit: 'hPa',
   location: 'HOME-LR',
+  time: NaN,
+  timestamp: NaN,
 };
 
 const sensor = {};
@@ -40,14 +47,23 @@ sensor.init = function init() {
   if (config.envName === constants.ENVIRONMENTS.PRODUCTION) {
     bme
       .init()
-      .then(() => logger.info('BME280 sensor initialized.'))
-      .catch((err) => logger.error(`BME280 initialization failed. ERROR: ${err}`));
+      .then()
+      .catch((err) => logger.error(`BME280 initialization failed. ERROR: ${err}`))
+      .finally(() => logger.info('BME280 sensor initialized.'));
   } else {
     logger.info('Mocked BME280 sensor initialized.');
   }
 };
 
 sensor.read = function read(callback) {
+  const time = moment();
+  temperatureMeasurement.time = time;
+  temperatureMeasurement.timestamp = time.unix();
+  humidityMeasurement.time = time;
+  humidityMeasurement.timestamp = time.unix();
+  pressureMeasurement.time = time;
+  pressureMeasurement.timestamp = time.unix();
+
   if (config.envName === constants.ENVIRONMENTS.PRODUCTION) {
     bme
       .readSensorData()
