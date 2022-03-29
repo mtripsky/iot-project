@@ -2,78 +2,35 @@ const moment = require('moment');
 
 const lib = {};
 
-lib.createFirebaseEntry = function createFirebaseEntry(message) {
-  const dbTime = moment();
-
+lib.createPostgresEntry = function createPostgresEntry(message, roundingValue) {
   if (message.hasOwnProperty('timestamp') && message.hasOwnProperty('time')) {
-    return {
-      timestamp: message.timestamp,
-      time: message.time,
-      value: message.value,
-      unit: message.unit,
-    };
+    const _timestamp = message.timestamp;
+    const _time = message.time;
   } else if (message.hasOwnProperty('timestamp')) {
-    return {
-      timestamp: message.timestamp,
-      time: moment.unix(message.timestamp).format(),
-      value: message.value,
-      unit: message.unit,
-    };
+    const _timestamp = message.timestamp;
+    const _time = moment.unix(message.timestamp).format();
   } else if (message.hasOwnProperty('time')) {
-    return {
-      timestamp: moment(message.time).unix(),
-      time: message.time,
-      value: message.value,
-      unit: message.unit,
-    };
+    const _timestamp = moment(message.time).unix();
+    const _time = message.time;
   } else {
-    return {
-      timestamp: moment().unix(),
-      time: moment(),
-      value: message.value,
-      unit: message.unit,
-    };
+    const _timestamp = moment().unix();
+    const _time = moment();
   }
-};
 
-lib.createPostgresEntry = function createPostgresEntry(message) {
-  if (message.hasOwnProperty('timestamp') && message.hasOwnProperty('time')) {
-    return {
-      timestamp: message.timestamp,
-      time: message.time,
-      value: message.value,
-      unit: message.unit,
-      location: message.location,
-      device: message.device,
-    };
-  } else if (message.hasOwnProperty('timestamp')) {
-    return {
-      timestamp: message.timestamp,
-      time: moment.unix(message.timestamp).format(),
-      value: message.value,
-      unit: message.unit,
-      location: message.location,
-      device: message.device,
-    };
-  } else if (message.hasOwnProperty('time')) {
-    return {
-      timestamp: moment(message.time).unix(),
-      time: message.time,
-      value: message.value,
-      unit: message.unit,
-      location: message.location,
-      device: message.device,
-    };
+  if (roundingValue) {
+    _value = Math.round(message.value * 10) / 10;
   } else {
-    return {
-      timestamp: moment().unix(),
-      time: moment(),
-      value: message.value,
-      unit: message.unit,
-      location: message.location,
-      device: message.device,
-    };
+    _value = message.value;
   }
+
+  return {
+    timestamp: _timestamp,
+    time: _time,
+    value: _value,
+    unit: message.unit,
+    location: message.location,
+    device: message.device,
+  };
 };
 
 module.exports = lib;

@@ -2,7 +2,6 @@ const logger = require('./lib/logger');
 const config = require('./lib/config');
 
 const receiver = require('./lib/receiver');
-const firebaseClient = require('./lib/firebaseClient');
 const postgresClient = require('./lib/postgresClient');
 
 const app = {};
@@ -16,7 +15,6 @@ app.init = function init() {
     },
     (topic, message) => {
       try {
-        firebaseClient.createEntry(topic, message);
         postgresClient.createEntry(topic, message);
 
         return {};

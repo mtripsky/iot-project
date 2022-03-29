@@ -58,7 +58,7 @@ client.createEntry = function createEntry(topic, message) {
 
   const tableName = message.type.toLowerCase();
   const insertIntoTableText = `INSERT INTO ${tableName}(data) VALUES($1) RETURNING *`;
-  const dbEntry = dbHelper.createPostgresEntry(message);
+  const dbEntry = dbHelper.createPostgresEntry(message, true);
 
   client.storage
     .query(insertIntoTableText, [dbEntry])

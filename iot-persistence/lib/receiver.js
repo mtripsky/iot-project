@@ -19,25 +19,15 @@ receiver.connect = function connect(connectCallback, msgCallback) {
       `Connected successfully to the MQTT broker. HOST: ${config.mqtt.host}, PORT: ${config.mqtt.port}.`
     );
 
-    receiver.client.subscribe(config.receiverTopics.homeClima);
-    logger.info(`Receiver subscribed to topic: ${config.receiverTopics.homeClima}`);
-    receiver.client.subscribe(config.receiverTopics.weather);
-    logger.info(`Receiver subscribed to topic: ${config.receiverTopics.weather}`);
+    config.receiverTopics.forEach(function (topic, index, array) {
+      receiver.client.subscribe(topic);
+      logger.info(`Receiver subscribed to topic: ${topic}`);
+    });
 
     receiver.client.on('message', (topic, message) => {
-      if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.homeClima)) {
-        logger.info(`[1] Received message with topic: ${topic}`);
-        const parsedMessage = helper.parseJsonToObject(message.toString());
-
-        msgCallback(topic, parsedMessage);
-      } else if (helper.isTopicEqualToTopicWithWildCard(topic, config.receiverTopics.weather)) {
-        logger.info(`[2] Received message with topic: ${topic}`);
-        const parsedMessage = helper.parseJsonToObject(message.toString());
-
-        msgCallback(topic, parsedMessage);
-      } else {
-        logger.debug(`[3] Received message with topic: ${topic}`);
-      }
+      logger.debug(`Received message with topic: ${topic}`);
+      const parsedMsg = helper.parseJsonToObject(message.toString());
+      msgCallback(topic, parsedMsg);
     });
 
     connectCallback();

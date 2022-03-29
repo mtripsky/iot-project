@@ -8,16 +8,10 @@ environments.development = {
     host: process.env.MQTT_BROKER_HOST,
     port: process.env.MQTT_BROKER_PORT,
   },
-  receiverTopics: {
-    homeClima: '/home/living-room/#',
-    weather: '/weather/#',
-  },
+  receiverTopics: process.env.MQTT_TOPICS.split(','),
   envName: constants.ENVIRONMENTS.DEVELOPMENT,
   log: {
     level: 'debug',
-  },
-  firebaseDB: {
-    url: process.env.FIREBASE_URL,
   },
   postgresDB: {
     user: process.env.POSTGRES_USER,
@@ -33,16 +27,10 @@ environments.production = {
     host: process.env.MQTT_BROKER_HOST,
     port: process.env.MQTT_BROKER_PORT,
   },
-  receiverTopics: {
-    homeClima: '/home/living-room/#',
-    weather: '/weather/#',
-  },
+  receiverTopics: process.env.MQTT_TOPICS.split(','),
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
     level: 'info',
-  },
-  firebaseDB: {
-    url: process.env.FIREBASE_URL,
   },
   postgresDB: {
     user: process.env.POSTGRES_USER,
