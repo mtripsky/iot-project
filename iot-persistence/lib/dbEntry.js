@@ -3,18 +3,19 @@ const moment = require('moment');
 const lib = {};
 
 lib.createPostgresEntry = function createPostgresEntry(message, roundingValue) {
+  let _timestamp, _time, _value;
   if (message.hasOwnProperty('timestamp') && message.hasOwnProperty('time')) {
-    const _timestamp = message.timestamp;
-    const _time = message.time;
+    _timestamp = message.timestamp;
+    _time = message.time;
   } else if (message.hasOwnProperty('timestamp')) {
-    const _timestamp = message.timestamp;
-    const _time = moment.unix(message.timestamp).format();
+    _timestamp = message.timestamp;
+    _time = moment.unix(message.timestamp).format();
   } else if (message.hasOwnProperty('time')) {
-    const _timestamp = moment(message.time).unix();
-    const _time = message.time;
+    _timestamp = moment(message.time).unix();
+    _time = message.time;
   } else {
-    const _timestamp = moment().unix();
-    const _time = moment();
+    _timestamp = moment().unix();
+    _time = moment();
   }
 
   if (roundingValue) {

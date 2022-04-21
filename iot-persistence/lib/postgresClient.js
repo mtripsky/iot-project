@@ -3,6 +3,7 @@ const logger = require('./logger');
 const config = require('./config');
 const dbHelper = require('./dbEntry');
 const parseHelper = require('./helpers');
+const querryStringBuilder = require('./querryStringBuilder');
 
 const client = {};
 
@@ -25,12 +26,8 @@ client.connect = function connect() {
   });
 
   config.postgresDB.tableNames.forEach(function (tableName, index, array) {
-    const createTableText = `
-    CREATE TABLE IF NOT EXISTS ${tableName} (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      data JSONB);`;
+    const createTableText = querryStringBuilder.createTable(tableName);
 
-    // create table
     client.storage
       .query(createTableText)
       .then((res) => {
@@ -54,26 +51,32 @@ client.disconnect = function disconnect() {
 };
 
 client.createEntry = function createEntry(topic, message) {
+  if(!msg.hasOwnProperty('type'))
+  {
+    logger.debug(`[PostgresClient] createEntry: No 'TYPE' in the incoming message.`)
+    return;
+  }
   logger.debug(`PostgresClient received message with topic: ${topic}`);
 
-  const tableName = message.type.toLowerCase();
-  const insertIntoTableText = `INSERT INTO ${tableName}(data) VALUES($1) RETURNING *`;
+  const insertIntoTableText = querryStringBuilder.insertJsonbIntoTable(message);
   const dbEntry = dbHelper.createPostgresEntry(message, true);
 
   client.storage
     .query(insertIntoTableText, [dbEntry])
     .then((res) => {
       logger.debug(
-        `[PostgresClient] Insert into table: ${tableName}. RESULT: ${parseHelper.parseObjectToString(
+        `[PostgresClient] Insert into table: ${message.type.toLowerCase()}. RESULT: ${parseHelper.parseObjectToString(
           res.rows[0]
         )}.`
       );
     })
     .catch((err) =>
       logger.error(
-        `[PostgresClient] Error when inserting into table: ${tableName}: ERROR: ${err.stack}.`
+        `[PostgresClient] Error when inserting into table: ${message.type.toLowerCase()}: ERROR: ${err.stack}.`
       )
-    );
+    )
+    .finally(() => {
+    });
 };
 
 client.printTable = function printTable(tableName) {
@@ -95,6 +98,83 @@ client.printTable = function printTable(tableName) {
       )
     );
 };
+
+client.getDailyExtremes = function getDailyExtremes(msg, cb) {
+  if(!msg.hasOwnProperty('type'))
+  {
+    logger.debug(`[PostgresClient] getDailyExtremes: No 'TYPE' in the incoming message.`)
+    return;
+  }
+  const queryString = querryStringBuilder.getDailyExtremes(msg);
+
+  client.storage
+    .query(queryString)
+    .then((res) => {
+      const message = {
+        type: msg.type,
+        min: res.rows[0].min,
+        max: res.rows[0].max,
+      };
+      logger.debug(`[PostgresClient] getDailyExtremes: ${JSON.stringify(message)}.`)
+
+      cb(message);
+    })
+    .catch((err) =>
+      logger.error(
+        `[PostgresClient] Error get daily extremes: ${msg.type.toLowerCase()}: ERROR: ${err.stack}.`
+      )
+    )
+    .finally(() => {
+    }); 
+}
+
+client.getLatestMeasuremnt = function getLatestMeasuremnt(msg, cb) {
+  if(!msg.hasOwnProperty('type'))
+  {
+    logger.debug(`[PostgresClient] getLatestMeasuremnt: No 'TYPE' in the incoming message.`)
+    return;
+  }
+  const table = msg.type.toLowerCase();
+  const queryString = querryStringBuilder.getLatestMeasurement(msg);
+  const queryStringExtremes = querryStringBuilder.getDailyExtremes(msg);
+
+  client.storage
+    .query(queryString)
+    .then((res) => {
+      logger.debug(`[PostgresClient] getLatestMeasuremnt: ${JSON.stringify(res.rows[0].data)}.`)
+      client.storage
+        .query(queryStringExtremes)
+        .then((resExtremes) => {
+          const message = {
+            type: res.rows[0].data.type,
+            time: res.rows[0].data.time,  
+            timestamp: res.rows[0].data.timestamp,
+            unit: res.rows[0].data.unit,
+            value: res.rows[0].data.value,
+            device: res.rows[0].data.device,
+            min: resExtremes.rows[0].min,
+            max: resExtremes.rows[0].max,
+            location: res.rows[0].data.location,
+          };
+          logger.debug(`[PostgresClient] last measurement: ${JSON.stringify(message)}.`)
+          cb(message);
+        })
+        .catch((err) =>
+          logger.error(
+            `[PostgresClient] Error get daily extremes in last measurement: ${table}: ERROR: ${err.stack}.`
+          )
+        )
+        .finally(() => {
+        }); 
+    })
+    .catch((err) =>
+      logger.error(
+        `[PostgresClient] Error get last measurement: ${table}: ERROR: ${err.stack}.`
+      )
+    )
+    .finally(() => {
+    }); 
+}
 
 client.connect();
 

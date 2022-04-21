@@ -1,37 +1,42 @@
 const logger = require('./lib/logger');
 const config = require('./lib/config');
 
-const receiver = require('./lib/receiver');
+const mqtclient = require('./lib/mqttclient');
 const postgresClient = require('./lib/postgresClient');
 
 const app = {};
 
 app.init = function init() {
   logger.info(`Starting IoT-persistence service in ${config.envName} mode .......`);
-
-  receiver.connect(
+    
+  mqtclient.connect(
     () => {
       logger.info('IoT-persistence service was initiated and is listening for messages.');
     },
     (topic, message) => {
       try {
-        postgresClient.createEntry(topic, message);
-
-        return {};
+        if (topic === '/raspiot-client/get-daily-extremes'){
+          postgresClient.getDailyExtremes(message, (msg) => {mqtclient.send(msg, '/raspiot-client/daily-extremes')});
+        } else if (topic === '/raspiot-client/get-latest-measurement'){
+          postgresClient.getLatestMeasuremnt(message, (msg) => {mqtclient.send(msg, '/raspiot-client/latest-measurement')});
+        } else {
+          postgresClient.createEntry(topic, message);
+        }
       } catch (err) {
         logger.error(
-          `Receiver.connect: An error occurred while trying to parse message: "${message}". ERROR: ${err}`
+          `mqtclient connect: An error occurred while trying to parse message: "${message}". ERROR: ${err}`
         );
         return {};
       }
     }
   );
+
 };
 
 app.shutdown = function shutdown() {
   clearInterval(app.intervalTimer);
   postgresClient.disconnect();
-  receiver.disconnect(() => {
+  mqtclient.disconnect(() => {
     process.exit();
   });
 };
