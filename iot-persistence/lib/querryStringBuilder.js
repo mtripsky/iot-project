@@ -1,15 +1,18 @@
+const moment = require('moment');
+
 const lib = {};
 
 function getWhereRestriction(msg) {
     let restrictionString = '';
     if(msg.hasOwnProperty('location')){
-        restrictionString.concat(` data->>'location'='${msg.location}' AND `);
+        restrictionString = restrictionString.concat(` data->>'location'='${msg.location}' AND `);
     }
     if(msg.hasOwnProperty('device')){
-        restrictionString.concat(` data->>'device'='${msg.device}' AND `);
+        restrictionString = restrictionString.concat(` data->>'device'='${msg.device}' AND `);
     }
+    const lastANDindex = restrictionString.lastIndexOf('AND');
 
-    return restrictionString;
+    return restrictionString.slice(0, lastANDindex);
 }
 
 lib.createTable = function createTable(tableName) {
@@ -32,7 +35,7 @@ lib.getDailyExtremes = function getDailyExtremes(msg) {
     return `SELECT MIN((data->>'value')::text::numeric) as min, MAX((data->>'value')::text::numeric) as max
             FROM ${tableName}
             WHERE ${getWhereRestriction(msg)}
-                ((data->>'timestamp')::text::numeric BETWEEN ${startDay} AND ${endDay});`
+                AND ((data->>'timestamp')::text::numeric BETWEEN ${startDay} AND ${endDay});`
 }
 
 lib.getLatestMeasurement = function getLatestMeasurement(msg) {

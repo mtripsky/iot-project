@@ -51,6 +51,11 @@ process.on('SIGTERM', () => {
   app.shutdown();
 });
 
+process.on('SIGKILL', () => {
+  logger.info('Got SIGKILL, gracefully shutting down');
+  app.shutdown();
+});
+
 app.init();
 
 module.exports = app;

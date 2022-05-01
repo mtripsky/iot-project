@@ -50,7 +50,7 @@ client.disconnect = function disconnect() {
   client.storage.end();
 };
 
-client.createEntry = function createEntry(topic, message) {
+client.createEntry = function createEntry(topic, msg) {
   if(!msg.hasOwnProperty('type'))
   {
     logger.debug(`[PostgresClient] createEntry: No 'TYPE' in the incoming message.`)
@@ -58,21 +58,21 @@ client.createEntry = function createEntry(topic, message) {
   }
   logger.debug(`PostgresClient received message with topic: ${topic}`);
 
-  const insertIntoTableText = querryStringBuilder.insertJsonbIntoTable(message);
-  const dbEntry = dbHelper.createPostgresEntry(message, true);
+  const insertIntoTableText = querryStringBuilder.insertJsonbIntoTable(msg);
+  const dbEntry = dbHelper.createPostgresEntry(msg, true);
 
   client.storage
     .query(insertIntoTableText, [dbEntry])
     .then((res) => {
       logger.debug(
-        `[PostgresClient] Insert into table: ${message.type.toLowerCase()}. RESULT: ${parseHelper.parseObjectToString(
+        `[PostgresClient] Insert into table: ${msg.type.toLowerCase()}. RESULT: ${parseHelper.parseObjectToString(
           res.rows[0]
         )}.`
       );
     })
     .catch((err) =>
       logger.error(
-        `[PostgresClient] Error when inserting into table: ${message.type.toLowerCase()}: ERROR: ${err.stack}.`
+        `[PostgresClient] Error when inserting into table: ${msg.type.toLowerCase()}: ERROR: ${err.stack}.`
       )
     )
     .finally(() => {
@@ -146,7 +146,7 @@ client.getLatestMeasuremnt = function getLatestMeasuremnt(msg, cb) {
         .query(queryStringExtremes)
         .then((resExtremes) => {
           const message = {
-            type: res.rows[0].data.type,
+            type: msg.type,
             time: res.rows[0].data.time,  
             timestamp: res.rows[0].data.timestamp,
             unit: res.rows[0].data.unit,
