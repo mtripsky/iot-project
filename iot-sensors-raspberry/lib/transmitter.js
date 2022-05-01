@@ -7,7 +7,7 @@ const config = require('./config');
 
 const transmitter = {};
 
-transmitter.connect = function connect(callback) {
+transmitter.connect = function connect(cb) {
   const connectOptions = {
     port: config.mqtt.port,
     host: config.mqtt.host,
@@ -18,7 +18,7 @@ transmitter.connect = function connect(callback) {
 
   transmitter.client.on('connect', () => {
     logger.info(`Connected successfully to the MQTT broker. HOST: ${config.mqtt.host}, PORT: ${config.mqtt.port}.`);
-    callback();
+    cb();
   });
 
   transmitter.client.on('error', (err) => {
@@ -27,7 +27,7 @@ transmitter.connect = function connect(callback) {
 };
 
 transmitter.send = function send(sensorMeasurement, topic) {
-  transmitter.client.publish(topic, JSON.stringify(sensorMeasurement), (err) => {
+  transmitter.client.publish(topic, JSON.stringify(sensorMeasurement), { qos: 1 }, (err) => {
     if (err) {
       logger.error(`An error occurred while trying to publish a message. ERROR: ${err}`);
     } else {
@@ -36,9 +36,9 @@ transmitter.send = function send(sensorMeasurement, topic) {
   });
 };
 
-transmitter.disconnect = function disconnect(callback) {
+transmitter.disconnect = function disconnect(cb) {
   transmitter.client.end();
-  callback();
+  cb();
 };
 
 module.exports = transmitter;

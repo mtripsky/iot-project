@@ -51,7 +51,7 @@ environments.production = {
     pressureLR: '/home/living-room/pressure',
   },
   gpioPins: {
-    DHT22: 16,
+    DHT22: process.env.DHT22_GPIO,
   },
   envName: constants.ENVIRONMENTS.PRODUCTION,
   log: {
