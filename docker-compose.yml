@@ -1,62 +1,58 @@
-version: '3'
+version: "3"
 services:
-  iot-broker:
-    image: eclipse-mosquitto
-    restart: always
-    container_name: iot-broker
-    volumes:
-      - ./iot-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./iot-broker/data:/mosquitto/data
-    network_mode: 'bridge'
-    ports:
-      - 1883:1883
-  iot-sensors-raspberry:
-    image: 'mtripsky/iot-sensors-raspberry:0.1.10'
-    container_name: 'iot-sensors-raspberry'
-    environment:
-      - MQTT_BROKER_HOST=localhost
-      - MQTT_BROKER_PORT=1883
-      - NODE_ENV=development
-      - SENSORS_READ_INTERVAL=60
-      - SENSOR_BME_CONNECTED=false
-      - SENSOR_DHT_CONNECTED=false
-    network_mode: 'host'
-    privileged: true
-    depends_on:
-      iot-broker:
-        condition: service_started
-      iot-persistence:
-        condition: service_started
-    devices:
-      - /dev/gpiomem:dev/gpiomem
-      - /dev/mem:/dev/mem
-      - /dev/i2c
-      - /dev/i2c-1
+  # iot-broker:
+  #   image: eclipse-mosquitto
+  #   restart: always
+  #   container_name: iot-broker
+  #   volumes:
+  #     - ./iot-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  #     - ./iot-broker/data:/mosquitto/data
+  #     - ./iot-broker/log:/mosquitto/log
+  #   network_mode: "bridge"
+  #   ports:
+  #     - 1883:1883
+  #     - 8883:8883
+  # iot-sensors-raspberry:
+  #   image: "mtripsky/iot-sensors-raspberry:0.1.13"
+  #   container_name: "iot-sensors-raspberry"
+  #   environment:
+  #     - MQTT_BROKER_HOST=localhost
+  #     - MQTT_BROKER_PORT=1883
+  #     - NODE_ENV=development
+  #     - SENSORS_READ_INTERVAL=10
+  #     - SENSOR_BME_CONNECTED=false
+  #     - SENSOR_DHT_CONNECTED=true
+  #     - DHT22_GPIO=6
+  #   network_mode: "host"
+  #   privileged: true
+  #   depends_on:
+  #     iot-broker:
+  #       condition: service_started
+  #     iot-persistence:
+  #       condition: service_started
   iot-persistence:
-    image: 'mtripsky/iot-persistence:0.1.37'
-    container_name: 'iot-persistence'
+    image: "mtripsky/iot-persistence:0.1.40"
+    container_name: "iot-persistence"
     environment:
       - MQTT_BROKER_HOST=localhost
       - MQTT_BROKER_PORT=1883
       - NODE_ENV=development
-      - FIREBASE_URL=https://weather-station-etterbeek.firebaseio.com
       - POSTGRES_USER=iot-project
       - POSTGRES_DB=iot-project
       - POSTGRES_PASSWORD=iot-project-password
       - POSTGRES_PORT=5432
-      - TABLE_NAMES=temperature,humidity,pressure,light_intensity,rain_intensity
-    network_mode: 'host'
-    volumes:
-      - ./db-keys/firebase-adminsdk.json:/home/node/app/db-keys/firebase-adminsdk.json
+      - MQTT_TOPICS=/home/living-room/#,/home/esp8266/#,/weather/#,/raspiot-client/#,
+      - TABLE_NAMES=temperature,humidity,pressure,dewpoint,heatindex,light_intensity,rain_intensity
+    network_mode: "host"
     privileged: true
     depends_on:
-      iot-broker:
-        condition: service_started
+      # iot-broker:
+      #   condition: service_started
       iot-db-postgres:
         condition: service_healthy
   iot-db-postgres:
-    image: 'arm32v7/postgres'
-    container_name: 'iot-db-postgres'
+    image: "arm32v7/postgres"
+    container_name: "iot-db-postgres"
     restart: always
     environment:
       - POSTGRES_PASSWORD=iot-project-password
@@ -64,12 +60,12 @@ services:
       - POSTGRES_DB=iot-project
     ports:
       - 5432:5432
-    network_mode: 'bridge'
+    network_mode: "bridge"
     volumes:
       - db-data:/var/lib/postgresql/data
     privileged: true
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U iot-project']
+      test: ["CMD-SHELL", "pg_isready -U iot-project"]
       interval: 5s
       timeout: 5s
       retries: 10
