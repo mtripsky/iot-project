@@ -1,0 +1,17 @@
+FROM arm32v7/python:3.10-slim-buster
+
+EXPOSE 8181
+
+COPY app.py ./
+
+# set the context from now on to use the root user for installing dependencies
+USER root
+
+#RUN apt-get install libglib2.0-dev
+RUN aptitude install libglib2.0-dev
+# cd .local/lib/python3.7/site-packages/bluepy
+# sudo setcap 'cap_net_raw,cap_net_admin+eip' bluepy-helper
+RUN pip install bluepy \
+    pip install --no-cache-dir paho-mqtt 
+
+CMD [ "python3", "./app.py"]
